@@ -25,6 +25,7 @@ async function initializeApp() {
     setupNavigation();
 }
 
+
 // Configurar modales
 function setupModals() {
     const loginModal = document.getElementById('login-modal');
