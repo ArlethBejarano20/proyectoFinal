@@ -71,7 +71,7 @@ function setupModals() {
     if (addPostBtn) {
         addPostBtn.addEventListener('click', async () => {
             if (!supabase) {
-                alert('Supabase no está configurado. Por favor configura las credenciales en js/config.js\n\nEl modal se abrirá pero no podrás publicar hasta configurar Supabase.');
+                alert('Supabase no está configurado.');
                 if (addPostModal) addPostModal.style.display = 'block';
                 return;
             }
