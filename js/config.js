@@ -17,3 +17,5 @@ try {
 } catch (error) {
     console.error("Error inicializando Supabase:", error);
 }
+
+
