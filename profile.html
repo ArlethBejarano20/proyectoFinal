@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - LokaLook</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html" style="text-decoration: none; color: inherit;">LokaLook</a></h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="index.html#destacados" class="nav-link">Destacados</a>
+                <div class="user-menu">
+                    <span id="user-name" class="user-name"></span>
+                    <button id="logout-btn" class="btn btn-outline">Cerrar Sesión</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profile-name">Usuario</h2>
+                    <p id="profile-email"></p>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-number" id="posts-count">0</span>
+                            <span class="stat-label">Publicaciones</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="likes-count">0</span>
+                            <span class="stat-label">Me Gusta</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="reviews-count">0</span>
+                            <span class="stat-label">Reseñas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-tabs">
+                <button class="tab-btn active" data-tab="posts">Mis Publicaciones</button>
+                <button class="tab-btn" data-tab="liked">Me Gusta</button>
+                <button class="tab-btn" data-tab="reviews">Mis Reseñas</button>
+            </div>
+
+            <div id="profile-content" class="profile-content">
+                <div id="posts-tab" class="tab-content active">
+                    <div id="my-posts-grid" class="posts-grid">
+                        <!-- Mis publicaciones -->
+                    </div>
+                </div>
+                <div id="liked-tab" class="tab-content">
+                    <div id="liked-posts-grid" class="posts-grid">
+                        <!-- Publicaciones que me gustan -->
+                    </div>
+                </div>
+                <div id="reviews-tab" class="tab-content">
+                    <div id="my-reviews-list" class="reviews-list">
+                        <!-- Mis reseñas -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/posts.js"></script>
+    <script src="js/reviews.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>
+

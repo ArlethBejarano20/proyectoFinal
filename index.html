@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LokaLook - Cafeterías en San Carlos Guaymas</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>LokaLook</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link active">Inicio</a>
+                <a href="#" id="destacados-link" class="nav-link">Destacados</a>
+                <div class="user-menu">
+                    <span id="user-name" class="user-name"></span>
+                    <button id="login-btn" class="btn btn-primary">Iniciar Sesión</button>
+                    <button id="profile-btn" class="btn btn-secondary" style="display: none;">Mi Perfil</button>
+                    <button id="logout-btn" class="btn btn-outline" style="display: none;">Cerrar Sesión</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Modal de Login -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+                <p class="form-footer">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Registrarse</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Nombre</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Contraseña</label>
+                    <input type="password" id="register-password" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
+                <p class="form-footer">¿Ya tienes cuenta? <a href="#" id="show-login">Inicia sesión aquí</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Nueva Publicación -->
+    <div id="add-post-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Agregar Cafetería</h2>
+            <form id="add-post-form">
+                <div class="form-group">
+                    <label for="post-name">Nombre de la Cafetería</label>
+                    <input type="text" id="post-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="post-image">URL de la Imagen</label>
+                    <input type="url" id="post-image" required>
+                </div>
+                <div class="form-group">
+                    <label for="post-description">Descripción</label>
+                    <textarea id="post-description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="post-address">Dirección</label>
+                    <input type="text" id="post-address" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Publicar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="hero-section">
+                <h2>Descubre las mejores cafeterías en San Carlos Guaymas</h2>
+                <button id="add-post-btn" class="btn btn-primary btn-large">
+                    <i class="fas fa-plus"></i> Agregar Cafetería
+                </button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Todas</button>
+                <button class="filter-btn" data-filter="featured">Destacadas</button>
+            </div>
+
+            <!-- Grid de Publicaciones -->
+            <div id="posts-grid" class="posts-grid">
+                <!-- Las publicaciones se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Detalles/Reseñas -->
+    <div id="post-detail-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close">&times;</span>
+            <div id="post-detail-content">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/posts.js"></script>
+    <script src="js/reviews.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
