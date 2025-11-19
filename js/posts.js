@@ -5,6 +5,7 @@ async function getPosts(filter = 'all') {
     if (!supabase) {
         return { success: true, data: [] };
     }
+    
     try {
         let query = supabase
             .from('posts')
