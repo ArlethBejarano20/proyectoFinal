@@ -11,7 +11,6 @@ async function getPosts(filter = 'all') {
             .from('posts')
             .select(`
                 *,
-                profiles:user_id (name),
                 likes (id, user_id),
                 reviews (id)
             `)
@@ -37,29 +36,81 @@ async function createPost(name, image, description, address) {
         return { success: false, error: 'Supabase no está configurado' };
     }
     try {
-        const user = await getCurrentUser();
-        if (!user) {
-            return { success: false, error: 'Debes iniciar sesión para publicar' };
+        // Verificar sesión y obtener el token JWT
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+            console.error('Error obteniendo sesión:', sessionError);
+            return { success: false, error: 'Error al verificar tu sesión. Por favor, inicia sesión nuevamente.' };
+        }
+        
+        if (!session || !session.user) {
+            return { success: false, error: 'Debes iniciar sesión para publicar. Por favor, inicia sesión nuevamente.' };
         }
 
+        // Verificar que el token esté presente
+        if (!session.access_token) {
+            console.error('No hay token de acceso en la sesión');
+            return { success: false, error: 'Tu sesión no tiene un token válido. Por favor, cierra sesión e inicia sesión nuevamente.' };
+        }
+
+        const userId = session.user.id;
+        
+        console.log('Creando publicación con user_id:', userId);
+        console.log('Token presente:', !!session.access_token);
+
+        // Asegurar que el cliente tenga la sesión actual
+        // El cliente de Supabase debería enviar automáticamente el token, pero lo verificamos
         const { data, error } = await supabase
             .from('posts')
             .insert([
                 {
-                    name: name,
-                    image_url: image,
-                    description: description,
-                    address: address,
-                    user_id: user.id
+                    name: name.trim(),
+                    image_url: image.trim(),
+                    description: description.trim(),
+                    address: address.trim(),
+                    user_id: userId
                 }
             ])
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error creando publicación:', error);
+            console.error('Error code:', error.code);
+            console.error('Error message:', error.message);
+            console.error('Session user id:', userId);
+            console.error('Session access_token presente:', !!session.access_token);
+            
+            // Manejar diferentes tipos de errores
+            if (error.code === '42501') {
+                // Error de RLS - el problema es que auth.uid() no coincide con user_id
+                // Esto puede pasar si el token no se está enviando correctamente
+                return { 
+                    success: false, 
+                    error: 'Error de permisos. El token de autenticación no se está enviando correctamente. Por favor, cierra sesión, recarga la página e inicia sesión nuevamente.' 
+                };
+            }
+            if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.message?.includes('token')) {
+                return { success: false, error: 'Tu sesión expiró. Por favor, inicia sesión nuevamente.' };
+            }
+            if (error.message?.includes('row-level security')) {
+                return { 
+                    success: false, 
+                    error: 'Error de permisos RLS. Verifica que las políticas estén correctamente configuradas en Supabase.' 
+                };
+            }
+            throw error;
+        }
+        
+        console.log('Publicación creada exitosamente:', data);
         return { success: true, data };
     } catch (error) {
-        return { success: false, error: error.message };
+        console.error('Error en createPost:', error);
+        return { 
+            success: false, 
+            error: error.message || 'Error al crear la publicación. Por favor, intenta nuevamente.' 
+        };
     }
 }
 
@@ -258,20 +309,36 @@ async function showPostDetail(postId) {
             .from('posts')
             .select(`
                 *,
-                profiles:user_id (name),
                 likes (id, user_id),
                 reviews (
                     id,
                     rating,
                     comment,
                     created_at,
-                    profiles:user_id (name)
+                    user_id
                 )
             `)
             .eq('id', postId)
             .single();
 
         if (error) throw error;
+
+        // Obtener nombres de perfiles para las reseñas
+        const reviewUserIds = post.reviews ? post.reviews.map(r => r.user_id) : [];
+        let profilesMap = {};
+        if (reviewUserIds.length > 0) {
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, name')
+                .in('id', reviewUserIds);
+            
+            if (profiles) {
+                profilesMap = profiles.reduce((acc, profile) => {
+                    acc[profile.id] = profile.name;
+                    return acc;
+                }, {});
+            }
+        }
 
         const liked = await checkUserLiked(postId);
         const likeCount = post.likes ? post.likes.length : 0;
@@ -299,7 +366,7 @@ async function showPostDetail(postId) {
                                 ? post.reviews.map(review => `
                                     <div class="review-item">
                                         <div class="review-header">
-                                            <span class="review-author">${review.profiles.name}</span>
+                                            <span class="review-author">${profilesMap[review.user_id] || 'Usuario'}</span>
                                             <span class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</span>
                                         </div>
                                         <p class="review-text">${review.comment}</p>
@@ -367,12 +434,5 @@ async function showPostDetail(postId) {
     }
 }
 
-// Función auxiliar para mostrar alertas
-function showAlert(message, type = 'success') {
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.textContent = message;
-    document.body.insertBefore(alert, document.body.firstChild);
-    setTimeout(() => alert.remove(), 5000);
-}
+// showAlert está definida en utils.js
 

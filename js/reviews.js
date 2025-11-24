@@ -58,14 +58,33 @@ async function getPostReviews(postId) {
     try {
         const { data, error } = await supabase
             .from('reviews')
-            .select(`
-                *,
-                profiles:user_id (name)
-            `)
+            .select('*')
             .eq('post_id', postId)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+        
+        // Obtener nombres de perfiles si hay reseñas
+        if (data && data.length > 0) {
+            const userIds = data.map(r => r.user_id);
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, name')
+                .in('id', userIds);
+            
+            if (profiles) {
+                const profilesMap = profiles.reduce((acc, profile) => {
+                    acc[profile.id] = profile.name;
+                    return acc;
+                }, {});
+                
+                // Agregar nombre del perfil a cada reseña
+                data.forEach(review => {
+                    review.profiles = { name: profilesMap[review.user_id] || 'Usuario' };
+                });
+            }
+        }
+        
         return { success: true, data: data || [] };
     } catch (error) {
         return { success: false, error: error.message };

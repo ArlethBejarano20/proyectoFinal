@@ -9,8 +9,37 @@ let supabase = null;
 
 try {
     if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
         console.log("Supabase conectado correctamente");
+        
+        // Configurar listener de autenticación inmediatamente
+        if (typeof setupAuthListener === 'function') {
+            setupAuthListener();
+        } else {
+            // Si la función aún no está disponible, esperar un momento
+            setTimeout(() => {
+                if (typeof setupAuthListener === 'function') {
+                    setupAuthListener();
+                }
+            }, 100);
+        }
+        
+        // Verificar sesión al inicializar y actualizar UI
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
+            if (session) {
+                console.log("Sesión encontrada al inicializar");
+                // Actualizar UI si hay una función disponible
+                if (typeof updateAuthUI === 'function') {
+                    await updateAuthUI();
+                }
+            }
+        });
     } else {
         console.warn("Faltan credenciales de Supabase.");
     }
